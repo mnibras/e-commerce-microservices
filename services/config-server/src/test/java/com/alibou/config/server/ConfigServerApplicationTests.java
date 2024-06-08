@@ -1,4 +1,4 @@
-package com.alibou.config_server;
+package com.alibou.config.server;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
