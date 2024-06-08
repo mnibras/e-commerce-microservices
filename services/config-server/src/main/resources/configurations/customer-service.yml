@@ -1,0 +1,12 @@
+server:
+    port: 8090
+
+spring:
+    data:
+        mongodb:
+            username: nibras
+            password: password
+            host: localhost
+            port: 27017
+            database: customer-db
+            authentication-database: admin
