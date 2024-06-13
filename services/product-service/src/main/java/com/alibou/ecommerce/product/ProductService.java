@@ -39,15 +39,20 @@ public class ProductService {
                 .stream()
                 .map(ProductPurchaseRequest::getProductId)
                 .toList();
+
         List<Product> storedProducts = productRepository.findAllByIdInOrderById(productIds);
+
         if (productIds.size() != storedProducts.size()) {
             throw new ProductPurchaseException("One or more products does not exists");
         }
+
         List<ProductPurchaseRequest> purchaseRequests = request
                 .stream()
                 .sorted(Comparator.comparing(ProductPurchaseRequest::getProductId))
                 .toList();
+
         List<ProductPurchaseResponse> purchasedProducts = new ArrayList<>();
+
         for (int i = 0; i < storedProducts.size(); i++) {
             Product product = storedProducts.get(i);
             ProductPurchaseRequest productPurchaseRequest = purchaseRequests.get(i);
@@ -56,8 +61,9 @@ public class ProductService {
             }
             double newAvailableQuantity = product.getAvailableQuantity() - productPurchaseRequest.getQuantity();
             product.setAvailableQuantity(newAvailableQuantity);
-            purchasedProducts.add(productMapper.toproductPurchaseResponse(product, productPurchaseRequest.getQuantity()));
+            purchasedProducts.add(productMapper.toProductPurchaseResponse(product, productPurchaseRequest.getQuantity()));
         }
+
         return purchasedProducts;
     }
 
