@@ -13,7 +13,7 @@ spring:
         database: postgresql
         database-platform: org.hibernate.dialect.PostgreSQLDialect
 
-# API-Gateway url instead of direct service url
+# API-Gateway url instead of direct service url - for better scalability
 application:
     config:
         customer-url: http://localhost:8090/api/v1/customers
