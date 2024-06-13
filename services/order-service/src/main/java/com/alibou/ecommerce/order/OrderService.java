@@ -52,7 +52,7 @@ public class OrderService {
             );
         }
 
-        // start payment process --> payment-service
+        // process payment --> payment-service
         PaymentRequest paymentRequest = new PaymentRequest(
                 orderRequest.getAmount(),
                 orderRequest.getPaymentMethod(),
