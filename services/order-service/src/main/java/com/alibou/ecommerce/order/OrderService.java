@@ -3,11 +3,14 @@ package com.alibou.ecommerce.order;
 import com.alibou.ecommerce.customer.CustomerClient;
 import com.alibou.ecommerce.customer.CustomerResponse;
 import com.alibou.ecommerce.exception.BusinessException;
+import com.alibou.ecommerce.kafka.OrderConfirmation;
+import com.alibou.ecommerce.kafka.OrderProducer;
 import com.alibou.ecommerce.orderline.OrderLineRequest;
 import com.alibou.ecommerce.orderline.OrderLineService;
 import com.alibou.ecommerce.product.ProductClient;
 import com.alibou.ecommerce.product.PurchaseRequest;
 import com.alibou.ecommerce.product.PurchaseResponse;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +25,7 @@ public class OrderService {
     private final ProductClient productClient;
     private final OrderMapper orderMapper;
     private final OrderLineService orderLineService;
+    private final OrderProducer orderProducer;
 
     public Integer createOrder(OrderRequest orderRequest) {
         // check the customer --> customer-service --> OpenFeign
@@ -29,7 +33,7 @@ public class OrderService {
                 .orElseThrow(() -> new BusinessException("Cannot create order:: No customer exists with provided Id:" + orderRequest.getCustomerId()));
 
         // purchase the products --> product-service --> Rest Template
-        List<PurchaseResponse> purchaseResponses = productClient.purchaseProducts(orderRequest.getProducts());
+        List<PurchaseResponse> purchasedProducts = productClient.purchaseProducts(orderRequest.getProducts());
 
         // persist order
         Order order = orderRepository.save(orderMapper.toOrder(orderRequest));
@@ -44,18 +48,30 @@ public class OrderService {
             );
         }
 
-
         // start payment process --> payment-service
 
         // send the order confirmation through kafka--> notification-service
-        return null;
+        orderProducer.sendOrderConfirmation(new OrderConfirmation(
+                orderRequest.getReference(),
+                orderRequest.getAmount(),
+                orderRequest.getPaymentMethod(),
+                customerResponse,
+                purchasedProducts
+        ));
+
+        return order.getId();
     }
 
     public List<OrderResponse> findAllOrders() {
-        return null;
+        return this.orderRepository.findAll()
+                .stream()
+                .map(orderMapper::fromOrder)
+                .toList();
     }
 
-    public OrderResponse findById(Integer orderId) {
-        return null;
+    public OrderResponse findById(Integer id) {
+        return this.orderRepository.findById(id)
+                .map(orderMapper::fromOrder)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("No order found with the provided ID: %d", id)));
     }
 }

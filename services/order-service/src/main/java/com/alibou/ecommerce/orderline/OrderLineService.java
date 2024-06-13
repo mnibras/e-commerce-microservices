@@ -3,6 +3,8 @@ package com.alibou.ecommerce.orderline;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class OrderLineService {
@@ -14,5 +16,12 @@ public class OrderLineService {
         OrderLine orderLine = orderLineMapper.toOrderLine(orderLineRequest);
         return orderLineRepository.save(orderLine).getId();
 
+    }
+
+    public List<OrderLineResponse> findAllByOrderId(Integer orderId) {
+        return orderLineRepository.findAllByOrderId(orderId)
+                .stream()
+                .map(orderLineMapper::toOrderLineResponse)
+                .toList();
     }
 }
