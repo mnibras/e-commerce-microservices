@@ -1,7 +1,7 @@
 services:
     postgres:
-        container_name: ms_postgresql
         image: postgres
+        container_name: postgresql
         environment:
             POSTGRES_USER: nibras
             POSTGRES_PASSWORD: password
@@ -15,8 +15,8 @@ services:
         restart: unless-stopped
 
     pgadmin:
-        container_name: ms_pgadmin
         image: dpage/pgadmin4
+        container_name: pgadmin
         environment:
             PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
             PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
@@ -32,8 +32,8 @@ services:
             - postgres
 
     mongodb:
-        container_name: ms_mongo_db
         image: mongo
+        container_name: mongo_db
         ports:
             - 27017:27017
         volumes:
@@ -43,8 +43,8 @@ services:
             MONGO_INITDB_ROOT_PASSWORD: password
 
     mongo-express:
-        container_name: ms_mongo_express
         image: mongo-express
+        container_name: mongo_express
         ports:
             - 8081:8081
         environment:
@@ -58,8 +58,8 @@ services:
             - mongodb
 
     zookeeper:
-        container_name: zookeeper
         image: confluentinc/cp-zookeeper:latest
+        container_name: zookeeper
         environment:
             ZOOKEEPER_SERVER_ID: 1
             ZOOKEEPER_CLIENT_PORT: 2181
@@ -69,8 +69,8 @@ services:
         networks:
             - microservices-network
     kafka:
-        container_name: ms_kafka
         image: confluentinc/cp-kafka:latest
+        container_name: kafka
         ports:
             - "9092:9092"
         depends_on:
@@ -86,8 +86,8 @@ services:
             - microservices-network
 
     mail-dev:
-        container_name: ms_mail_dev
         image: maildev/maildev
+        container_name: mail_dev
         ports:
             - 1080:1080
             - 1025:1025
