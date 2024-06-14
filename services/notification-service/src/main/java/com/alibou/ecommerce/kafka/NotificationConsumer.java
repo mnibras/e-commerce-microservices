@@ -6,6 +6,7 @@ import com.alibou.ecommerce.kafka.payment.PaymentConfirmation;
 import com.alibou.ecommerce.notification.Notification;
 import com.alibou.ecommerce.notification.NotificationRepository;
 import com.alibou.ecommerce.notification.NotificationType;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -22,7 +23,7 @@ public class NotificationConsumer {
     private final EmailService emailService;
 
     @KafkaListener(topics = "payment-topic")
-    public void consumePaymentConfirmationNotification(PaymentConfirmation paymentConfirmation) {
+    public void consumePaymentConfirmationNotification(PaymentConfirmation paymentConfirmation) throws MessagingException {
         log.info("Consuming message from payment-topic Topic: {}", paymentConfirmation);
         Notification notification = Notification.builder()
                 .notificationType(NotificationType.PAYMENT_CONFIRMATION)
@@ -31,11 +32,16 @@ public class NotificationConsumer {
                 .build();
         notificationRepository.save(notification);
 
-        // todo send email
+        emailService.sendPaymentSuccessEmail(
+                paymentConfirmation.getCustomerEmail(),
+                String.format("%s %s", paymentConfirmation.getCustomerFirstname(), paymentConfirmation.getCustomerLastname()),
+                paymentConfirmation.getAmount(),
+                paymentConfirmation.getOrderReference()
+        );
     }
 
     @KafkaListener(topics = "order-topic")
-    public void consumeOrderConfirmationNotification(OrderConfirmation orderConfirmation) {
+    public void consumeOrderConfirmationNotification(OrderConfirmation orderConfirmation) throws MessagingException {
         log.info("Consuming message from order-topic Topic: {}", orderConfirmation);
         Notification notification = Notification.builder()
                 .notificationType(NotificationType.ORDER_CONFIRMATION)
@@ -44,7 +50,13 @@ public class NotificationConsumer {
                 .build();
         notificationRepository.save(notification);
 
-        // todo send email
+        emailService.sendOrderConfirmationEmail(
+                orderConfirmation.getCustomer().getEmail(),
+                String.format("%s %s", orderConfirmation.getCustomer().getFirstname(), orderConfirmation.getCustomer().getLastname()),
+                orderConfirmation.getTotalAmount(),
+                orderConfirmation.getOrderReference(),
+                orderConfirmation.getProducts()
+        );
     }
 
 }
