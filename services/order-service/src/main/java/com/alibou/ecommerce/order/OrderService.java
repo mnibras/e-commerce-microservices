@@ -56,8 +56,8 @@ public class OrderService {
         PaymentRequest paymentRequest = new PaymentRequest(
                 orderRequest.getAmount(),
                 orderRequest.getPaymentMethod(),
-                orderRequest.getId(),
-                orderRequest.getReference(),
+                order.getId(),
+                order.getReference(),
                 customerResponse
         );
         paymentClient.createPayment(paymentRequest);
