@@ -20,6 +20,7 @@ public class OrderProducer {
         Message<OrderConfirmation> message = MessageBuilder
                 .withPayload(orderConfirmation)
                 .setHeader(KafkaHeaders.TOPIC, "order-topic")
+                .setHeader("type", "orderConfirmation")
                 .build();
 
         kafkaTemplate.send(message);

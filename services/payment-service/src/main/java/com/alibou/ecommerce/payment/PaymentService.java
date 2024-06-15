@@ -1,7 +1,7 @@
 package com.alibou.ecommerce.payment;
 
 import com.alibou.ecommerce.notification.NotificationProducer;
-import com.alibou.ecommerce.notification.PaymentNotificationRequest;
+import com.alibou.ecommerce.notification.PaymentConfirmation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,7 @@ public class PaymentService {
 
     public Integer createPayment(PaymentRequest paymentRequest) {
         Payment payment = paymentRepository.save(paymentMapper.toPayment(paymentRequest));
-        PaymentNotificationRequest paymentNotificationRequest = new PaymentNotificationRequest(
+        PaymentConfirmation paymentConfirmation = new PaymentConfirmation(
                 paymentRequest.getOrderReference(),
                 paymentRequest.getAmount(),
                 paymentRequest.getPaymentMethod(),
@@ -23,7 +23,7 @@ public class PaymentService {
                 paymentRequest.getCustomer().getLastname(),
                 paymentRequest.getCustomer().getEmail()
         );
-        notificationProducer.sendNotification(paymentNotificationRequest);
+        notificationProducer.sendNotification(paymentConfirmation);
         return payment.getId();
     }
 }

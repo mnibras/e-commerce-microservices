@@ -61,6 +61,7 @@ public class ProductService {
             }
             double newAvailableQuantity = product.getAvailableQuantity() - productPurchaseRequest.getQuantity();
             product.setAvailableQuantity(newAvailableQuantity);
+            productRepository.save(product);
             purchasedProducts.add(productMapper.toProductPurchaseResponse(product, productPurchaseRequest.getQuantity()));
         }
 

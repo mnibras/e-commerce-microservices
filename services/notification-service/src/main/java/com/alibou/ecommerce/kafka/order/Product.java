@@ -1,14 +1,15 @@
 package com.alibou.ecommerce.kafka.order;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class Product {
 
     private Integer productId;
